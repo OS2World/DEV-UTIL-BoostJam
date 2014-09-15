@@ -1,0 +1,48 @@
+Notes for OS/2 users
+====================
+Cornelis BockemÅhl, 2006-08-11
+
+History of this port
+--------------------
+
+From the sources it was obvious that Jam used to support OS/2 some time back in the 90-ies, but this was not updated any more later on. However, it still facilitaded the current port.
+
+This current OS/2 port only supports one toolset "gcc" (see "Installation"). The earlier port used to support three of them: VISUALAGE, WATCOM and EMX (gcc). It should not be difficult at all to reactivate them; I simply did not take the time to do it myself...
+
+The most important addition for this OS/2 version is the way command execution is done. The OS/2 way of doing it is integrated into the exexunix.c file with the necessary #if branches. The problem was that the OS/2 command interpreter is not able to handle commands spanning several lines like unixoid shells seem to do. So this is now how the OS/2 version handles commands (defined as "actions" in jam files):
+
+1. Cut the command string into pieces at line ends.
+
+2. Trim whitespace (blanks and tabs) from the left. Remove all "commands" that are now empty.
+
+3. If now only one command remains, this is passed to the command interpreter that is indicated with the COMSPEC environment variable.
+
+4. If more than one command remains, a temporary file is created, the commands are written in there, then the temporary file is passed to the command interpreter in COMSPEC as a command file and then the temporary file is deleted.
+
+Note that this means that you do not necessarily use the original CMD.EXE command interpreter; if you are otherwise working with another one, this other interpreter will be used by bjam as well. This allows you to use e.g. the 32-bit command interpreter by Jonathan deBoyne-Pollard (see http://homepages.tesco.net/J.deBoynePollard/Softwares/cmd.html) that allows you to enter command lines with virtually no size limitation.
+
+Note that this also has a "cosmetic" side effect: you will see all commands coming from the temporary command file echoed (or echoed twice if you turned on echoing of commands in bjam), while this does not happen with the commands that are alone within an actions clause.
+
+Installation
+------------
+
+Environment for Boost Jam for OS/2; please insert your gcc base path:
+
+SET JAM_TOOLSET=gcc
+SET gcc=Y:\Gcc\v3.3.5\usr
+
+If bjam.exe is in your PATH, this is all you need to run it.
+
+Introduction
+------------
+
+A good introduction to the Jam language and its logic can be found here. This also helps you further once you are through:
+
+http://www.perforce.com/perforce/conf2001/wingerd/WPLaura.pdf
+
+Bug reports
+-----------
+
+If you find any bugs of this port or other problems, please contact me:
+
+Cornelis BockemÅhl - cornelis {DOT} bockemuehl {AT} tele2 {DOT} ch

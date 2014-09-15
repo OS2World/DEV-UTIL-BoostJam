@@ -1,0 +1,47 @@
+How to compile a new OS/2 version of boost jam
+==============================================
+Cornelis BockemÅhl, 2006-08-11
+
+Precondition
+------------
+
+A working gcc installation with environment variables set in such a way that gcc can be called from anywhere in the file system.
+Note that currently no other compilers than gcc are supported (or just tested!?) for OS/2.
+
+Bootstrap version (i.e., no working bjam.exe available)
+-------------------------------------------------------
+
+This generates an operational jam0.exe for the generation of bjam.exe:
+
+gcc -g -Zomf -DNO_VFORK -o bootstrap\jam0.exe command.c compile.c debug.c execunix.c expand.c glob.c hash.c hdrmacro.c headers.c jam.c jambase.c jamgram.c lists.c make.c make1.c newstr.c option.c parse.c pathunix.c regexp.c rules.c scan.c search.c subst.c timestamp.c variable.c modules.c strings.c filesys.c fileunix.c builtins.c pwd.c class.c w32_getreg.c native.c modules/set.c modules/path.c modules/regex.c modules/property-set.c modules/sequence.c modules/order.c
+
+Compilation of bjam.exe with bootstrap jam version
+--------------------------------------------------
+
+Note: replace the toolset root value with a valid path on your system!
+
+bootstrap\jam0.exe -f build.jam --toolset=gcc "--toolset-root=Y:\Gcc\v3.3.5\usr" clean
+bootstrap\jam0.exe -d 2 -f build.jam --toolset=gcc "--toolset-root=Y:\Gcc\v3.3.5\usr"
+
+Compilation of bjam.exe with bjam.exe
+-------------------------------------
+
+If you already have an operational bjam.exe you can use this to generate a new one; just replace jam0.exe by bjam.exe. Put it to a location in your PATH after compilation succeeds:
+
+bjam.exe -f build.jam --toolset=gcc "--toolset-root=Y:\Gcc\v3.3.5\usr" clean
+bjam.exe -d 2 -f build.jam --toolset=gcc "--toolset-root=Y:\Gcc\v3.3.5\usr"
+
+Update the Jambase
+------------------
+
+If you need to update the Jambase, you can incorporate that into bjam.exe as follows.
+
+First you need mkjambase.exe:
+
+gcc -g -Zomf -DNO_VFORK -o bin.os2\mkjambase.exe mkjambase.c
+
+Then you generate a new jambase.c from Jambase using that new tool:
+
+bin.os2\mkjambase.exe jambase.c Jambase
+
+Finally recompile bjam.exe as above.
